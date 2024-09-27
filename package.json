@@ -8,11 +8,12 @@
     "eject": "react-scripts eject"
   },
   "dependencies": {
+    "babel-loader": "^9.2.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "babel-loader": "^9.2.1",
+    "react-scripts": "^5.0.0",
+    "svgo": "^2.8.0",
     "webpack": "^5.95.0",
-    "webpack-dev-server": "^5.1.0",
-    "react-scripts": "^5.0.0"
+    "webpack-dev-server": "^5.1.0"
   }
 }

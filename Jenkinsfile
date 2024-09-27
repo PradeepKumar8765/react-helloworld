@@ -2,20 +2,19 @@ pipeline {
     agent any
 
     environment {
-        AWS_ACCESS_KEY_ID = credentials('aws-access-key-id')
-        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
-        AWS_REGION = 'us-east-1' 
+        AWS_REGION = 'us-east-1'
     }
 
     stages {
         stage('Clone Repository') {
             steps {
                 script {
-                    // Clone the repository and ensure the master branch is checked out
+                    // Clone the repository
                     git 'https://github.com/PradeepKumar8765/react-helloworld.git'
                 }
             }
         }
+
         stage('Build Docker Image') {
             steps {
                 script {
@@ -41,10 +40,12 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    // Update kubeconfig for the EKS cluster
-                    sh 'aws eks update-kubeconfig --region $AWS_REGION --name prod-cluster'
-                    // Deploy the application using kubectl
-                    sh 'kubectl apply -f app-deployment.yml'
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials']]) {
+                        // Update kubeconfig for the EKS cluster
+                        sh 'aws eks update-kubeconfig --region $AWS_REGION --name prod-cluster'
+                        // Deploy the application using kubectl
+                        sh 'kubectl apply -f app-deployment.yml'
+                    }
                 }
             }
         }
@@ -65,4 +66,3 @@ pipeline {
         }
     }
 }
-

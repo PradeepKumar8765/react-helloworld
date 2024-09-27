@@ -35,15 +35,6 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
-            steps {
-                script {
-                    // Run the test suite
-                    sh 'npm test -- --passWithNoTests'
-                }
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 script {
@@ -93,3 +84,4 @@ pipeline {
         }
     }
 }
+

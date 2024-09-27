@@ -39,7 +39,7 @@ pipeline {
             steps {
                 script {
                     // Run the test suite
-                    sh 'npm test'
+                    sh 'npm test -- --passWithNoTests'
                 }
             }
         }

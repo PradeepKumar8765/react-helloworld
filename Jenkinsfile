@@ -3,6 +3,7 @@ pipeline {
   environment {
     AWS_ACCESS_KEY_ID = credentials('aws-access-key-id')
     AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
+    AWS_REGION = 'us-east-1' // Add AWS region if needed
   }
   stages {
     stage('Clone repository') {
@@ -49,7 +50,7 @@ pipeline {
     stage('Deploy to Kubernetes') {
       steps {
         script {
-          sh 'aws eks update-kubeconfig --region us-east-1 --name prod-cluster'
+          sh 'aws eks update-kubeconfig --region $AWS_REGION --name prod-cluster'
           sh 'kubectl apply -f app-deployment.yml'
         }
       }

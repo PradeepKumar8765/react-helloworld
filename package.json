@@ -1,22 +1,17 @@
 {
-  "name": "helloworld",
+  "name": "react-helloworld",
   "version": "1.0.0",
-  "description": "---\r first, you should install node and npm.",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack-dev-server --hot"
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
-  "author": "\u001b[A\u001b[A\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[Chttps://github.com/PradeepKumar8765/react-helloworld.git\u001b[B\u001b[B\u001b[B",
-  "license": "ISC",
   "dependencies": {
-    "babel-core": "^6.26.3",
-    "babel-loader": "9.2.1",
-    "babel-preset-es2015": "^6.24.1",
-    "babel-preset-react": "^6.24.1",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
-    "webpack": "5.95.0",
-    "webpack-dev-server": "5.1.0"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "babel-loader": "^9.2.1",
+    "webpack": "^5.95.0",
+    "webpack-dev-server": "^5.1.0"
   }
 }

@@ -12,7 +12,7 @@ pipeline {
             steps {
                 script {
                     // Clone the repository and ensure the master branch is checked out
-                    git branch: 'master', url: 'https://github.com/PradeepKumar8765/react-helloworld.git'
+                    git 'https://github.com/PradeepKumar8765/react-helloworld.git'
                 }
             }
         }

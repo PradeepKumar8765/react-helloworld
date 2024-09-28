@@ -1,13 +1,22 @@
 pipeline {
   agent any
   stages {
-    stage('build the project') {
+    stage('Clone the project') {
       steps {
         git 'https://github.com/PradeepKumar8765/react-helloworld.git'
-        sh 'mvn clean package'
       }
     }
-    stage('Building docker image') {
+    stage('Install dependencies') {
+      steps {
+        sh 'npm install'
+      }
+    }
+    stage('Build the project') {
+      steps {
+        sh 'npm run build'
+      }
+    }
+    stage('Build Docker image') {
       steps {
         script {
           sh 'docker build -t pradeep82kumar/react-app:v1 .'
@@ -15,11 +24,11 @@ pipeline {
         }
       }
     }
-    stage('push to docker-hub') {
+    stage('Push to Docker Hub') {
       steps {
         withCredentials([usernamePassword(credentialsId: 'docker-creds', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
           sh "echo $PASS | docker login -u $USER --password-stdin"
-          sh 'pradeepkumar/react-app:v1'
+          sh 'docker push pradeep82kumar/react-app:v1'
         }
       }
     }
@@ -37,14 +46,14 @@ pipeline {
         }
       }
     }
-    stage('Terraform destroy & apply for test workspace') {
+    stage('Terraform apply for test workspace') {
       steps {
         withCredentials([amazonWebServicesCredentials(credentialsId: 'aws-credentials')]) {
           sh 'terraform apply -auto-approve'
         }
       }
     }
-    stage('get kubeconfig') {
+    stage('Get kubeconfig for test') {
       steps {
         withCredentials([amazonWebServicesCredentials(credentialsId: 'aws-credentials')]) {
           sh 'aws eks update-kubeconfig --region us-east-1 --name test-cluster'
@@ -52,7 +61,7 @@ pipeline {
         }
       }
     }
-    stage('Deploying the application') {
+    stage('Deploy the application to test') {
       steps {
         sh 'kubectl apply -f app-deploy.yml'
         sh 'kubectl get svc'
@@ -77,14 +86,14 @@ pipeline {
         }
       }
     }
-    stage('Terraform destroy & apply for production workspace') {
+    stage('Terraform apply for production workspace') {
       steps {
         withCredentials([amazonWebServicesCredentials(credentialsId: 'aws-credentials')]) {
           sh 'terraform apply -auto-approve'
         }
       }
     }
-    stage('get kubeconfig for production') {
+    stage('Get kubeconfig for production') {
       steps {
         withCredentials([amazonWebServicesCredentials(credentialsId: 'aws-credentials')]) {
           sh 'aws eks update-kubeconfig --region us-east-1 --name prod-cluster'
@@ -92,7 +101,7 @@ pipeline {
         }
       }
     }
-    stage('Deploying the application to production') {
+    stage('Deploy the application to production') {
       steps {
         sh 'kubectl apply -f app-deploy.yml'
         sh 'kubectl get svc'
@@ -100,3 +109,4 @@ pipeline {
     }
   }
 }
+

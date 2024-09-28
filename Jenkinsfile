@@ -1,9 +1,5 @@
 pipeline {
   agent any
-  environment {
-    AWS_ACCESS_KEY_ID = credentials('aws-access-key-id')
-    AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
-  }
   stages {
     stage('build the project') {
       steps {
@@ -30,24 +26,30 @@ pipeline {
     stage('Terraform Operations for test workspace') {
       steps {
         script {
-          sh '''
-            terraform workspace select test || terraform workspace new test
-            terraform init
-            terraform plan
-            terraform destroy -auto-approve
-          '''
+          withCredentials([amazonWebServicesCredentials(credentialsId: 'aws-credentials')]) {
+            sh '''
+              terraform workspace select test || terraform workspace new test
+              terraform init
+              terraform plan
+              terraform destroy -auto-approve
+            '''
+          }
         }
       }
     }
     stage('Terraform destroy & apply for test workspace') {
       steps {
-        sh 'terraform apply -auto-approve'
+        withCredentials([amazonWebServicesCredentials(credentialsId: 'aws-credentials')]) {
+          sh 'terraform apply -auto-approve'
+        }
       }
     }
     stage('get kubeconfig') {
       steps {
-        sh 'aws eks update-kubeconfig --region us-east-1 --name test-cluster'
-        sh 'kubectl get nodes'
+        withCredentials([amazonWebServicesCredentials(credentialsId: 'aws-credentials')]) {
+          sh 'aws eks update-kubeconfig --region us-east-1 --name test-cluster'
+          sh 'kubectl get nodes'
+        }
       }
     }
     stage('Deploying the application') {
@@ -64,24 +66,30 @@ pipeline {
       }
       steps {
         script {
-          sh '''
-            terraform workspace select prod || terraform workspace new prod
-            terraform init
-            terraform plan
-            terraform destroy -auto-approve
-          '''
+          withCredentials([amazonWebServicesCredentials(credentialsId: 'aws-credentials')]) {
+            sh '''
+              terraform workspace select prod || terraform workspace new prod
+              terraform init
+              terraform plan
+              terraform destroy -auto-approve
+            '''
+          }
         }
       }
     }
     stage('Terraform destroy & apply for production workspace') {
       steps {
-        sh 'terraform apply -auto-approve'
+        withCredentials([amazonWebServicesCredentials(credentialsId: 'aws-credentials')]) {
+          sh 'terraform apply -auto-approve'
+        }
       }
     }
     stage('get kubeconfig for production') {
       steps {
-        sh 'aws eks update-kubeconfig --region us-east-1 --name prod-cluster'
-        sh 'kubectl get nodes'
+        withCredentials([amazonWebServicesCredentials(credentialsId: 'aws-credentials')]) {
+          sh 'aws eks update-kubeconfig --region us-east-1 --name prod-cluster'
+          sh 'kubectl get nodes'
+        }
       }
     }
     stage('Deploying the application to production') {

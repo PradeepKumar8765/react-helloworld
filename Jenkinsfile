@@ -1,5 +1,9 @@
 pipeline {
   agent any
+  environment {
+    AWS_ACCESS_KEY_ID = credentials('aws-access-key-id')
+    AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
+  }
   stages {
     stage('Clone the project') {
       steps {
@@ -16,8 +20,8 @@ pipeline {
     }
     stage('Push to Docker Hub') {
       steps {
-        withCredentials([[$class: 'AmazonWebServicesCredentials', accessKey: 'aws-access-key', secretKey: 'aws-secret-key']]) {
-          sh "echo $PASS | docker login -u $USER --password-stdin"
+        script {
+          sh "echo \$PASS | docker login -u \$USER --password-stdin"
           sh 'docker push pradeep82kumar/react-app:v1'
         }
       }
@@ -25,30 +29,24 @@ pipeline {
     stage('Terraform Operations for test workspace') {
       steps {
         script {
-         withCredentials([[$class: 'AmazonWebServicesCredentials', accessKey: 'aws-access-key', secretKey: 'aws-secret-key']]) {
-            sh '''
-              terraform workspace select test || terraform workspace new test
-              terraform init
-              terraform plan
-              terraform destroy -auto-approve
-            '''
-          }
+          sh '''
+            terraform workspace select test || terraform workspace new test
+            terraform init
+            terraform plan
+            terraform destroy -auto-approve
+          '''
         }
       }
     }
     stage('Terraform apply for test workspace') {
       steps {
-       withCredentials([[$class: 'AmazonWebServicesCredentials', accessKey: 'aws-access-key', secretKey: 'aws-secret-key']]) {
-          sh 'terraform apply -auto-approve'
-        }
+        sh 'terraform apply -auto-approve'
       }
     }
     stage('Get kubeconfig for test') {
       steps {
-      withCredentials([[$class: 'AmazonWebServicesCredentials', accessKey: 'aws-access-key', secretKey: 'aws-secret-key']]) {
-          sh 'aws eks update-kubeconfig --region us-east-1 --name test-cluster'
-          sh 'kubectl get nodes'
-        }
+        sh 'aws eks update-kubeconfig --region us-east-1 --name test-cluster'
+        sh 'kubectl get nodes'
       }
     }
     stage('Deploy the application to test') {
@@ -65,30 +63,24 @@ pipeline {
       }
       steps {
         script {
-         withCredentials([[$class: 'AmazonWebServicesCredentials', accessKey: 'aws-access-key', secretKey: 'aws-secret-key']]){
-            sh '''
-              terraform workspace select prod || terraform workspace new prod
-              terraform init
-              terraform plan
-              terraform destroy -auto-approve
-            '''
-          }
+          sh '''
+            terraform workspace select prod || terraform workspace new prod
+            terraform init
+            terraform plan
+            terraform destroy -auto-approve
+          '''
         }
       }
     }
     stage('Terraform apply for production workspace') {
       steps {
-       withCredentials([[$class: 'AmazonWebServicesCredentials', accessKey: 'aws-access-key', secretKey: 'aws-secret-key']]) {
-          sh 'terraform apply -auto-approve'
-        }
+        sh 'terraform apply -auto-approve'
       }
     }
     stage('Get kubeconfig for production') {
       steps {
-       withCredentials([[$class: 'AmazonWebServicesCredentials', accessKey: 'aws-access-key', secretKey: 'aws-secret-key']]) {
-          sh 'aws eks update-kubeconfig --region us-east-1 --name prod-cluster'
-          sh 'kubectl get nodes'
-        }
+        sh 'aws eks update-kubeconfig --region us-east-1 --name prod-cluster'
+        sh 'kubectl get nodes'
       }
     }
     stage('Deploy the application to production') {
@@ -99,4 +91,3 @@ pipeline {
     }
   }
 }
-

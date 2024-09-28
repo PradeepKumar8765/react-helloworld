@@ -19,13 +19,13 @@ pipeline {
       }
     }
     stage('Push to Docker Hub') {
-      steps {
-        script {
-          sh "echo \$PASS | docker login -u \$USER --password-stdin"
-          sh 'docker push pradeep82kumar/react-app:v1'
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'docker-creds', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
+                    sh "echo \$PASS | docker login -u \$USER --password-stdin"
+                    sh 'docker push pradeep82kumar/react-app:v1'
+                }
+            }
         }
-      }
-    }
     stage('Terraform Operations for test workspace') {
       steps {
         script {

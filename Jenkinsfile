@@ -6,16 +6,6 @@ pipeline {
         git 'https://github.com/PradeepKumar8765/react-helloworld.git'
       }
     }
-    stage('Install dependencies') {
-      steps {
-        sh 'npm install'
-      }
-    }
-    stage('Build the project') {
-      steps {
-        sh 'npm run build'
-      }
-    }
     stage('Build Docker image') {
       steps {
         script {
